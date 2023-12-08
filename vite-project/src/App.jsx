@@ -7,6 +7,7 @@ import Error from './component/Error'
 import StartScreen from './component/StartScreen';
 import Question from './component/Question';
 import NextButton from './component/NextButton';
+import Progress from './Progress';
 
 //import DateCounter from './DateCounter'
 
@@ -57,9 +58,10 @@ switch (action.type) {
 
 function App() {
 
- const [{questions, status, index, answer}, dispatch] = useReducer(reducer,  initialState)
+ const [{questions, status, index, answer, points}, dispatch] = useReducer(reducer,  initialState)
   
  const numQuestions = questions.length;
+ const maxPossiblepoints = questions.reduce((prev, cur) => prev + cur.points ,  0)
 
  useEffect(function (){
   fetch('http://localhost:9000/questions')
@@ -75,8 +77,10 @@ function App() {
       {status === 'loading' && <Loader/>}
       {status === 'error' && <Error/>}
       {status === 'ready' && <StartScreen numQuestions={numQuestions} dispatch={dispatch}/>}
-      {status === "active" && ( <>  <Question question={questions[index]} dispatch={dispatch} 
-      answer={answer}/> 
+      {status === "active" && ( 
+      <> 
+     <Progress index={index} numQuestions={numQuestions} points={points} maxPossiblepoints={maxPossiblepoints} answer={answer} />
+     <Question question={questions[index]} dispatch={dispatch} answer={answer}/> 
      <NextButton dispatch = {dispatch} answer={answer} />
      </>
       )}
