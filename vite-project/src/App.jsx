@@ -8,6 +8,7 @@ import StartScreen from './component/StartScreen';
 import Question from './component/Question';
 import NextButton from './component/NextButton';
 import Progress from './Progress';
+import FinishScreen from './FinishScreen';
 
 //import DateCounter from './DateCounter'
 
@@ -17,6 +18,7 @@ const initialState = {
   index: 0,
   answer: null,
   points: 0,
+  highscore: 0,
 
 };
 
@@ -50,7 +52,10 @@ switch (action.type) {
             ...state, index: state.index + 1, answer: null
           };  
 
-        
+        case "finish":
+          return {...state, 
+            status: "finished", 
+            highscore:  state.points > state.highscore ? state.points :  state.highscore};
   default: 
   throw new Error('Action unkonwn');
 }
@@ -58,7 +63,7 @@ switch (action.type) {
 
 function App() {
 
- const [{questions, status, index, answer, points}, dispatch] = useReducer(reducer,  initialState)
+ const [{questions, status, index, answer, points, highscore}, dispatch] = useReducer(reducer,  initialState)
   
  const numQuestions = questions.length;
  const maxPossiblepoints = questions.reduce((prev, cur) => prev + cur.points ,  0)
@@ -81,9 +86,12 @@ function App() {
       <> 
      <Progress index={index} numQuestions={numQuestions} points={points} maxPossiblepoints={maxPossiblepoints} answer={answer} />
      <Question question={questions[index]} dispatch={dispatch} answer={answer}/> 
-     <NextButton dispatch = {dispatch} answer={answer} />
+     <NextButton dispatch = {dispatch} answer={answer} numQuestions={numQuestions} index={index} />
      </>
       )}
+      {status === 'finished' && <FinishScreen points={points} maxPossiblePoints={maxPossiblepoints} 
+      highscore={highscore}
+       />}
      </MainApp>
     </div>
   )
