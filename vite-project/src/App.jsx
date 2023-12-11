@@ -9,8 +9,12 @@ import Question from './component/Question';
 import NextButton from './component/NextButton';
 import Progress from './Progress';
 import FinishScreen from './FinishScreen';
+import Footer from './component/Footer';
+import Timer from './component/Timer';
 
 //import DateCounter from './DateCounter'
+
+ const SECS_PER_QUESTION = 30;
 
 const initialState = {
   questions:[], 
@@ -19,6 +23,7 @@ const initialState = {
   answer: null,
   points: 0,
   highscore: 0,
+  secondsRemaining:null,
 
 };
 
@@ -35,7 +40,8 @@ switch (action.type) {
     };
     case 'start' :
       return{
-        ...state, status: "active",
+        ...state, status: "active", 
+        secondsRemaining:state.questions.length * SECS_PER_QUESTION,
       };
     
       case 'newAnswer' :
@@ -62,6 +68,12 @@ switch (action.type) {
            ...initialState, questions: state.questions, 
            status: 'ready'
           };
+        case "tick":
+          return {
+            ...state, secondsRemaining: state.secondsRemaining -1, 
+            status: state.secondsRemaining === 0 ? 'finished' : state.status,
+          }
+
   default: 
   throw new Error('Action unkonwn');
 }
@@ -69,7 +81,7 @@ switch (action.type) {
 
 function App() {
 
- const [{questions, status, index, answer, points, highscore}, dispatch] = useReducer(reducer,  initialState)
+ const [{questions, status, index, answer, points, highscore,  secondsRemaining}, dispatch] = useReducer(reducer,  initialState)
   
  const numQuestions = questions.length;
  const maxPossiblepoints = questions.reduce((prev, cur) => prev + cur.points ,  0)
@@ -92,7 +104,10 @@ function App() {
       <> 
      <Progress index={index} numQuestions={numQuestions} points={points} maxPossiblepoints={maxPossiblepoints} answer={answer} />
      <Question question={questions[index]} dispatch={dispatch} answer={answer}/> 
+     <Footer>
+     <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
      <NextButton dispatch = {dispatch} answer={answer} numQuestions={numQuestions} index={index} />
+     </Footer>
      </>
       )}
       {status === 'finished' && <FinishScreen points={points} maxPossiblePoints={maxPossiblepoints} 
