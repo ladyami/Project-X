@@ -56,6 +56,12 @@ switch (action.type) {
           return {...state, 
             status: "finished", 
             highscore:  state.points > state.highscore ? state.points :  state.highscore};
+
+        case "restart":
+          return {
+           ...initialState, questions: state.questions, 
+           status: 'ready'
+          };
   default: 
   throw new Error('Action unkonwn');
 }
@@ -90,7 +96,7 @@ function App() {
      </>
       )}
       {status === 'finished' && <FinishScreen points={points} maxPossiblePoints={maxPossiblepoints} 
-      highscore={highscore}
+      highscore={highscore} dispatch={dispatch}
        />}
      </MainApp>
     </div>
